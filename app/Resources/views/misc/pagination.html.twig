@@ -1,0 +1,45 @@
+{% set routeName = app.request.get('_route') %}
+
+{% if parameters.pagesCount > 1 and parameters.pagesCount <= 10 %}
+    <div class="container-fluid obg-paginator">
+        <ul class="pagination">
+            {% for i in 1 .. parameters.pagesCount %}
+                {% set queryParams = app.request.query.all|merge({'page': i}) %}
+                <li><a {% if i==currentPage %} class="active" {% endif %} href="{{ path(routeName, queryParams) }}">{{ i }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% if parameters.pagesCount > 10 %}
+    <div class="container-fluid obg-paginator">
+        <ul class="pagination">
+            {% set queryParams = app.request.query.all|merge({'page': 1}) %}
+            <li><a class="{% if currentPage == 1 %}active{% endif %}" href="{{ path(routeName, queryParams) }}">{{ 1 }}</a></li>
+
+            {% set leftOffset = 4 %}
+            {% set rightOffset = 4 %}
+
+            {% if currentPage >= 1 and currentPage < 6 %}
+                {% set rightOffset = 10-currentPage %}
+                {% set leftOffset = 10-(10-currentPage) %}
+            {% endif %}
+
+            {% if currentPage > parameters.pagesCount-6 and currentPage <= parameters.pagesCount %}
+                {% set leftOffset = 9-(parameters.pagesCount - currentPage) %}
+            {% endif %}
+
+            {% for i in currentPage-leftOffset..currentPage+rightOffset %}
+                {% if i > 1  and i < parameters.pagesCount %}
+                    {% set queryParams = app.request.query.all|merge({'page': i}) %}
+                    <li><a class="{% if currentPage == i %}active{% endif %}" href="{{ path(routeName, queryParams) }}">{{ i }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% set queryParams = app.request.query.all|merge({'page': parameters.pagesCount }) %}
+            <li>
+                <a class="{% if currentPage == parameters.pagesCount %}active{% endif %}" href="{{ path(routeName, queryParams) }}">{{ parameters.pagesCount}}</a>
+            </li>
+        </ul>
+    </div>
+{% endif %}

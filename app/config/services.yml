@@ -1,0 +1,223 @@
+# Learn more about services, parameters and containers at
+# http://symfony.com/doc/current/book/service_container.html
+parameters:
+#    parameter_name: value
+
+services:
+#    service_name:
+#        class: AppBundle\Directory\ClassName
+#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+
+    # Friends of Symfony User Bundle Configuration
+    fos_user.doctrine_registry:
+        alias: doctrine
+        
+    app_user.registration_completed:
+        class: AppBundle\UserBundle\EventListener\RegistrationCompletedListener
+        arguments: ["@doctrine.orm.entity_manager", "@router"]
+        tags:
+            - { name: kernel.event_subscriber }
+
+    obg_select_project_listener:
+            class: AppBundle\ObgSelectProjectListener\ObgSelectProjectListener
+            arguments: ["@obg_storage_service", "@security.token_storage", "@doctrine.orm.entity_manager"]
+            tags:
+                - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 5 }
+
+    app_bundle.security.interactive_login_listener:
+        class: AppBundle\ObgLoginListener\ObgLoginListener
+        arguments: ['@security.token_storage', '@doctrine', '@obg_storage_service', '@obg_permissions']
+        tags:
+            - { name: 'kernel.event_listener', event: security.interactive_login, method: onAuthenticationSuccess }
+
+    app_bundle.service.listener:
+        class: AppBundle\Listener\ObgCalendarLoadDataListener
+        arguments: ['@doctrine.orm.entity_manager', "@session"]
+        tags:
+            - { name: 'kernel.event_listener', event: 'fullcalendar.set_data', method: loadData }
+
+    obg_search:
+        class: AppBundle\Search\ObgSearch
+        name: obg_search
+        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage", "@obg_paginator"]
+
+    obg_permissions:
+        class: AppBundle\ObgPermissions\ObgPermissions
+        name: obg_permissions
+        arguments: ["@doctrine.orm.entity_manager", "@security.token_storage"]
+
+    obg_storage_service:
+        class: AppBundle\ObgSessionStorage\ObgSessionStorage
+        name: obg_storage_service
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    sync_service:
+        class: AppBundle\Service\SyncService
+        name: sync_service
+        arguments: ["@session"]
+
+    dashboard:
+        class: AppBundle\Dashboard\Dashboard
+        name: obg_search
+        arguments: ["@doctrine.orm.entity_manager", "@router"]
+
+    obg_paginator:
+        class: AppBundle\ObgPaginator\ObgPaginator
+        name: obg_paginator
+        arguments: ["@doctrine.orm.entity_manager"]
+
+    country_year_form:
+        class: AppBundle\Form\CountryYearForm
+        arguments: ["@obg_search", "@obg_permissions", "@security.token_storage"]
+        tags:
+          - {name: form.type}
+
+    companies_edit_form:
+        class: AppBundle\Form\CompaniesEditForm
+        arguments: ["@obg_search"]
+        tags:
+            - { name: form.type }
+
+    contacts_edit_form:
+        class: AppBundle\Form\ContactsEditForm
+        arguments: ["@obg_search", "@doctrine.orm.entity_manager"]
+        tags:
+            - { name: form.type }
+
+    saved_searches_search_form:
+        class: AppBundle\Form\SavedSearchesSearchForm
+        tags:
+          - { name: form.type }
+
+    quick_search_form:
+        class: AppBundle\Form\QuickSearchForm
+        tags:
+          - { name: form.type }
+
+    contacts_search_form:
+        class: AppBundle\Form\ContactsSearchForm
+        arguments: ["@obg_search"]
+        tags:
+           - { name: form.type }
+
+    app.form.registration:
+        class: AppBundle\Form\RegistrationType
+        tags:
+            - { name: form.type, alias: app_user_registration }
+
+    app.form.profile:
+        class: AppBundle\Form\ProfileType
+        tags:
+            - { name: form.type, alias: app_user_profile }
+
+    personal_assistant:
+      class: AppBundle\Service\PersonalAssistant
+      name: personal_assistant
+      arguments: ['@doctrine.orm.entity_manager']
+
+    crud_events_listener:
+        class: AppBundle\Listener\CRUDEventsListener
+        name: crud_events_listener
+        arguments: ["@sync_service"]
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postUpdate }
+            - { name: doctrine.event_listener, event: preRemove }
+
+    projects_manage_form:
+        class: AppBundle\Form\ProjectsManageForm
+        arguments: ["@obg_search"]
+        tags:
+           - { name: form.type }
+
+    projects_new_form:
+        class: AppBundle\Form\ProjectsNewForm
+        tags:
+           - { name: form.type }
+
+    companies_by_status_form:
+        class: AppBundle\Form\CompaniesByStatusForm
+        arguments: ["@obg_search"]
+        tags:
+           - { name: form.type }
+
+    select_project_form:
+        class: AppBundle\Form\SelectProjectForm
+        arguments: ["@obg_search"]
+        tags:
+           - { name: form.type }
+
+    user_country_available_years:
+           class: AppBundle\Form\UserAvailableYearsByCountry
+           tags:
+              - { name: form.type }
+
+    meetings_search_form:
+        class: AppBundle\Form\MeetingsSearchForm
+        arguments: ["@obg_search", "@obg_search_meetings", "@doctrine.orm.entity_manager"]
+        tags:
+            - { name: form.type }
+
+    obg_search_companies:
+        class: AppBundle\ObgSearchCompanies\ObgSearchCompanies
+        name: obg_search_companies
+        arguments: ["@doctrine.orm.entity_manager", "@obg_paginator"]
+
+    obg_search_meetings:
+        class: AppBundle\ObgSearchMeetings\ObgSearchMeetings
+        name: obg_search_meetings
+        arguments: ["@doctrine.orm.entity_manager", "@obg_paginator", "@obg_search"]
+
+    obg_id_generator:
+        class: AppBundle\ObgIdGenerator\ObgIdGenerator
+        name: obg_id_generator
+
+    companies_search_form:
+        class: AppBundle\Form\CompaniesSearchForm
+        arguments: ["@obg_search", "@obg_search_companies"]
+        tags:
+            - { name: form.type }
+
+    companies_edit_page_form:
+        class: AppBundle\Form\CompaniesEditPageForm
+        arguments: ["@obg_search", '@doctrine.orm.entity_manager']
+        tags:
+           - { name: form.type }
+
+    meeting_edit_form:
+        class: AppBundle\Form\MeetingEditForm
+        arguments: ["@obg_search", '@doctrine.orm.entity_manager']
+        tags:
+           - { name: form.type }
+
+    economic_update_subscription_edit_form:
+           class: AppBundle\Form\EconomicUpdateSubscriptionEditForm
+           arguments: ["@doctrine.orm.entity_manager", "@obg_search"]
+           tags:
+                - { name: form.type }
+
+    histories_edit_form:
+        class: AppBundle\Form\HistoriesEditForm
+        arguments: ["@obg_search"]
+        tags:
+          - { name: form.type }
+
+    app_bundle_new_user_country_form:
+        class: AppBundle\Form\NewUserCountryForm
+        tags:
+          - { name: form.type }
+
+    agenda_search_form:
+        class: AppBundle\Form\AgendaSearchForm
+        tags:
+          - { name: form.type }
+
+    obg_migration:
+        class: AppBundle\ObgMigration\ObgMigration
+        name: obg_migration
+        arguments: ['@doctrine.orm.entity_manager', '@fos_user.util.user_manipulator', '@fos_user.util.password_updater']
+
+    obg_companies_has_rating:
+         class: AppBundle\Form\CompaniesHasRating
+         tags:
+           - { name: form.type }

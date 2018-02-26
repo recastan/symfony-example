@@ -1,0 +1,47 @@
+<form name="{{ parameters.name }}" class="form-inline obg-search-countries-form container">
+    <div class="col-md-12 obg-search-inputs-wrapper">
+        {% for item in parameters.formItems %}
+            <div class="form-group">
+                {% if form_errors(item) is not empty %}
+                    <div class="form-errors">
+                        {{ form_errors(item) }}
+                    </div>
+                {% endif %}
+                <div class="obg-search-input-wrapper">
+                    {{ form_widget(item) }}
+                </div>
+            </div>
+        {% endfor %}
+
+        {% if parameters.dateRangeItems is defined and  parameters.dateRangeItems is not empty %}
+            {% for dateRangeItem in parameters.dateRangeItems %}
+                <div class="form-group">
+                    {% if form_errors(dateRangeItem) is not empty %}
+                        <div class="form-errors">
+                            {{ form_errors(dateRangeItem) }}
+                        </div>
+                    {% endif %}
+                    <div class="obg-search-input-wrapper obg-date-range-field">
+                        {{ form_label(dateRangeItem) }}
+                        {{ form_widget(dateRangeItem) }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if parameters.radios is defined and  parameters.radios is not empty %}
+            {% for radio in parameters.radios %}
+                <div class="form-group obg-company-search obg-custom-radio-buttons-widget">
+                    {{ form_label(radio) }}
+                    {{ form_widget(radio) }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="form-group obg-button-form-group">
+            <a class="btn obg-form-btn obg-clear-form-btn" href="{{ path(app.request.get('_route')) }}">Clear form</a>
+        </div>
+        <div class="form-group obg-button-form-group">
+            {{ form_row(form.Search) }}
+        </div>
+    </div>
+</form>

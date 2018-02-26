@@ -1,0 +1,43 @@
+security:
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt
+        
+    role_hierarchy:
+        ROLE_USER:        ROLE_OUTLOOK_FILES
+        ROLE_ADMIN:       ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN
+        
+    providers:
+        fos_userbundle:
+            id: fos_user.user_provider.username
+            
+    firewalls:
+        # disables authentication for assets and the profiler, adapt it according to your needs
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+            
+        main:
+            pattern: ^/
+            form_login:
+                provider: fos_userbundle
+                csrf_token_generator: security.csrf.token_manager
+                always_use_default_target_path: true
+                default_target_path: /dashboard
+            logout: true
+            anonymous: true
+            remember_me:
+                secret: %secret%
+                lifetime: 86400 # 1 day in seconds
+                path: /               
+                
+    access_control:
+        - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/outlook_file, role: ROLE_OUTLOOK_FILES }
+        - { path: ^/register/confirmed, role: ROLE_USER }
+        - { path: ^/register, role: ROLE_ADMIN }
+        - { path: ^/projects, role: ROLE_ADMIN }
+        - { path: ^/developer, role: ROLE_ADMIN }
+        - { path: ^/admin/tags, role: ROLE_OUTLOOK_FILES}
+        - { path: ^/admin, role: ROLE_ADMIN }
+        - { path: ^/, role: ROLE_USER }

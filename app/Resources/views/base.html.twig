@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        {# @todo: We don't need to download web fonts from googleapis  #}
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
+        <title>{% block title %}OBG CRM{% endblock %}</title>
+
+        {% stylesheets '@bootstrap_css' '@obg_main' 'bundles/pinanoselect2/css/select2.css' %}
+            <link rel="stylesheet" type="text/css" media="screen" href="{{ asset_url }}"/>
+        {% endstylesheets %}
+
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        {% block javascripts %}
+            {% javascripts '@jquery' '@bootstrap_js' '@PinanoSelect2Bundle/Resources/public/js/select2.min.js' '@obg_form_year_country_ajax_callback' '@obg_quick_search_js'%}
+            <script type="text/javascript" src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        {% endblock %}
+    </head>
+
+    {% set routeName = app.request.attributes.get('_route') %}
+
+    <body>
+        <div class="container-fluid obg-main-menu-wrapper">
+            <nav class="navbar navbar-static-top navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                    <span class="obg-navbar-brand">
+                        <a href="{{ rootPath }}">
+                            {% image '%kernel.root_dir%/Resources/public/images/logo.svg' %}
+                            <img height="50px" alt="Oxford Business Group" src="{{ asset_url }}" />
+                            {% endimage %}
+                        </a>
+                    </span>
+                    {% if is_granted('ROLE_USER') %}
+                        {{ render(controller('AppBundle:ChangeProjectCountry:ChangeProjectCountry')) }}
+                    {% endif %}
+                    </div>
+                    <ul class="nav navbar-nav navbar-right obg-main-nav">
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li {% if routeName == 'developer_index' %} class="active" {% endif %}><a href="{{ path('developer_index') }}">Migrations</a></li>
+                            <li {% if routeName == 'obg_countries_index' or routeName == 'obg_years_index' or routeName == 'projects_index' %} class = 'dropdown active' {% else %} class="dropdown" {% endif %}>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Projects<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li class="{% if routeName == 'obg_countries_index' %}active{% endif %}"><a href="{{ path('obg_countries_index') }}">Project Countries</a></li>
+                                    <li><a class="{% if routeName == 'obg_years_index' %}active{% endif %}" href="{{ path("obg_years_index") }}">Project Years</a></li>
+                                    <li class="{% if routeName == 'projects_index' %}active{% endif %}" role="presentation"><a href="{{ path('projects_index') }}">Projects List</a></li>
+                                </ul>
+                            </li>
+                            <li {% if routeName == 'fos_user_registration_register' or routeName == 'obg_user_log' or routeName == 'obg_users_list' %} class = 'dropdown active' {% else %} class="dropdown" {% endif %}>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ path('fos_user_registration_register') }}">Register New User</a></li>
+                                    <li><a href = "{{ path('obg_user_log') }}">Users Access Log</a></li>
+                                    <li><a href = "{{ path('obg_users_list') }}">Users List</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        {% if is_granted('ROLE_USER') %}
+                            <li {% if routeName == 'tagsvocabulary_index' %} class="active" {% endif %}><a href="{{ path('tagsvocabulary_index') }}">Tags</a></li>
+                            <li {% if routeName == 'saved_searches_index' %} class="active" {% endif %} ><a href="{{ path('saved_searches_index') }}">Searches</a></li>
+                            <li ><a href="{{ path('fos_user_security_logout') }}">Log Out</a></li>
+                        {% else %}
+                            <li><a href="{{ path('fos_user_security_login') }}">Log In</a></li>
+                        {% endif %}
+                    </ul>
+
+                    {% block project_year_form_block %}
+                    {% endblock %}
+                </div>
+            </nav>
+            {% if is_granted('ROLE_USER') %}
+            <nav class="navbar-fixed-top obg-vertival-nav-tabs">
+                <div class="container">
+                    <ul class="nav obg-navbar-top nav-tabs">
+                        <li class="{% if routeName == 'app_bundle_dashboard'%}active{% endif %}" role="presentation"><a href="{{ path('app_bundle_dashboard') }}">Dashboard</a></li>
+                        <li class="{% if routeName == 'contacts_index' %}active{% endif %}" role="presentation"><a href="{{ path('contacts_index') }}">Contacts</a></li>
+                        <li class="{% if routeName == 'companies_index' %}active{% endif %}" role="presentation"><a href="{{ path('companies_index') }}">Companies</a></li>
+                        <li class="{% if routeName == 'meetings_index' %}active{% endif %}" role="presentation" ><a href="{{ path('meetings_index') }}">Meeting Notes</a></li>
+                        <li class="{% if routeName == 'agenda_index' %}active{% endif %}" role="presentation" ><a href="{{ path('agenda_index') }}">Agenda</a></li>
+                    </ul>
+                    <div class="quick-search " role="presentation"> {{ render(controller('AppBundle:AjaxAutocomplete:getQuickSearchForm')) }} </div>
+                </div>
+            </nav>
+            {% endif %}
+        </div>
+        <div class="container-fluid obg-wrapper {% if routeName == 'app_outlook_file_contact' or routeName == 'app_outlook_file_company' %}record-page {% endif %}">
+            {% block body %}{% endblock %}
+        </div>
+    </body>
+</html>

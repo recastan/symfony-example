@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if app.request.get('page') is defined and app.request.get('page') is not null %}
+        {% set currentPage = app.request.get('page') %}
+    {% else %}
+        {% set currentPage = 1 %}
+        {{ app.request.query.add({'page': currentPage}) }}
+    {% endif %}
+
+    <div class="container">
+        <h1>Project years</h1>
+    </div>
+    <div class="obg-search-helper-panel panel panel-default container">
+        {% if perPage is defined and years is defined %}
+            <h4 class="obg-status-panel-heading">
+                Showing results: {{ (currentPage-1) * perPage }} - {{ (currentPage-1) * perPage + years|length }}
+                of {{ totalResults }}
+            </h4>
+            <a href="{{ path("obg_years_add_new") }}" class="pull-right obg-submit-btn obg-form-btn btn">+ Add New Project Year</a>
+        {% endif %}
+    </div>
+
+    <div class="container obg-wrapper-table">
+        <table class="table obg-companies-table table-hover">
+            <thead>
+            <tr>
+                <th>Project Year</th>
+                <th>Removed</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if years is not defined or years is empty %}
+                <tr>
+                    <td colspan="10" class="text-center"><strong>No results</strong></td>
+                </tr>
+            {% else %}
+                {% for year in years %}
+                    <tr>
+                        <td>
+                            <p
+                                    {% if year.projectYear is not defined or year.projectYear is empty %} class="obg-no-data-field-slug" {% endif %}>
+                                {% if year.projectYear is defined and year.projectYear is not empty %}
+                                    {{ year.projectYear }}
+                                {% else %}
+                                    No data
+                                {% endif %}
+                            </p>
+                        </td>
+
+                        <td>
+                            {% if year.removed is defined and year.removed == true %}
+                                <p>Yes</p>
+                            {% endif %}
+                            {% if year.removed is defined and year.removed == false %}
+                                <p>No</p>
+                            {% endif %}
+                            {% if year.removed is not defined %}
+                                <p>na</p>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="obg-companies-actions-list btn-group obg-button-group">
+                                <a type="button" href="{{ path('obg_years_edit_year', {'id':year.id}) }}"
+                                   class="btn btn-default obg-action-dropdown-btn">Edit</a>
+                                <button type="button" class="btn obg-action-dropdown-btn btn-default dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="{{ path("obg_years_delete_year", {'id': year.id}) }}">Delete</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

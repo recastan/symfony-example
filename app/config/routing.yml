@@ -1,0 +1,52 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+
+root:
+    path: /
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /dashboard
+        permanent: true
+
+test_full_calendar:
+    path: /full-calendar/load
+    defaults:
+        _controller: FullCalendarBundle:Calendar:load
+    options:
+        expose: true
+
+ajax_contacts_by_company:
+    path: /ajax/contacts-by-company
+    defaults:
+        _controller: AppBundle:AjaxAutocomplete:getContactsListByCompany
+    options:
+        expose: true
+
+meeting_note_auto_save:
+    path: /meetings/meeting/{meetingNoteId}/edit/auto-save
+    defaults:
+        _controller: AppBundle:CRUDMeetings:meetingNoteAutoSave
+    options:
+        expose: true
+
+meeting_edit:
+    path: /meetings/meeting/{meetingNoteId}/edit
+    defaults:
+        _controller: AppBundle:CRUDMeetings:editMeeting
+    options:
+        expose: true
+
+fos_user_security:
+    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+    
+fos_user_register:
+    resource: "@FOSUserBundle/Resources/config/routing/registration.xml"
+    prefix: /register
+
+ancarebeca_fullcalendar:
+    resource: "@FullCalendarBundle/Resources/config/routing.yml"
+
+fos_js_routing:
+    resource: "@FOSJsRoutingBundle/Resources/config/routing/routing.xml"
+

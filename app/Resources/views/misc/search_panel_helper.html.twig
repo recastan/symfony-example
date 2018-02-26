@@ -1,0 +1,9 @@
+{% set firstItemNumberOnThisPage = (searchParameters.currentPage-1) * searchParameters.perPage %}
+{% if searchParameters.length > 0 %}
+    {% set firstItemNumberOnThisPage = (searchParameters.currentPage-1) * searchParameters.perPage + 1%}
+{% endif %}
+{% set lastItemNumberOnThisPage = (searchParameters.currentPage-1) * searchParameters.perPage + searchParameters.length %}
+
+<h4 class="obg-status-panel-heading">
+    Showing results: {{ firstItemNumberOnThisPage }} - {{ lastItemNumberOnThisPage }} of {{ total}}
+</h4>

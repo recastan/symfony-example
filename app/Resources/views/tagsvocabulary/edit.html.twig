@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme edit_form 'bootstrap_3_layout.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Edit vocabulary</h1>
+        {%  if errors is not empty %}
+            {% for error in errors %}
+            <div class="alert alert-danger">
+                <strong> Error! </strong> {{ error }}
+            </div>
+            {% endfor  %}
+        {%  endif %}
+    </div>
+    <div class="container panel panel-default">
+        <div class="panel-body">
+            <form class="form-horizontal" method="post">
+                {% for form_item in edit_form %}
+                    {% if (form_item.vars.name != "_token" and form_item.vars.name != "save" and form_item.vars.name != "delete") %}
+                        <div class="form-group">
+                            <div class="col-md-2 control-label">
+                                {{ form_label(form_item) }}
+                            </div>
+                            <div class="col-lg-4">
+                                {{ form_widget(form_item) }}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <div class="form-group pull-right">
+                    {{ form_row(edit_form._token) }}
+                    {{ form_widget(edit_form.delete) }}
+                    {{ form_widget(edit_form.save) }}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container obg-wrapper-table">
+        <a href="{{ path("tagsterms_new", {'vocabulary': tagsVocabulary.id}) }}" class="pull-right obg-submit-btn obg-form-btn btn">Add New Tag</a>
+        <h2>Available Tags in this vocabulary</h2>
+        <table id="obg-projects-table" class="table obg-companies-table table-hover">
+            <thead>
+                <tr>
+                    <th>Tag name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        <tbody>
+        {% if tags is not defined or tags is empty %}
+            <tr>
+                <td colspan="10" class="text-center"><strong>No results</strong></td>
+            </tr>
+        {% else %}
+            {% for tag in tags %}
+                <tr>
+                    <td>
+                         {{ tag.name }}
+                    </td>
+                    <td>
+                        <div class="obg-companies-actions-list btn-group obg-button-group">
+                            <a type="button" href="{{ path('tagsterms_edit', {'id': tag.id}) }}" class="btn btn-default obg-action-dropdown-btn">View</a>
+                            <button type="button" class="btn obg-action-dropdown-btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    {% set delete_form_name = 'delete_term_'~tag.id %}
+                                    <form name="{{ delete_form_name}}" method="POST" action="{{ path('term_delete', {'id': tag.id}) }}">
+                                        <input type="hidden" id="_token" name="_token" value="{{ csrf_token('delete_token') }}">
+                                        <input class="obg-dropdown-menu-button" type="submit" value="Delete">
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+        </table>
+    </div>
+{% endblock %}

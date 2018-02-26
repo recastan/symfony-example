@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container"><h1>Tags Vocabularies</h1></div>
+    <div class="obg-search-helper-panel panel panel-default container">
+        <a href="{{ path("tagsvocabulary_new") }}" class="pull-right obg-submit-btn obg-form-btn btn">+ Add New Vocabulary</a>
+    </div>
+<div class="container obg-wrapper-table">
+    <div class="obg-status-messages">
+    </div>
+    {%  if errors is not empty %}
+        {% for error in errors %}
+            <div class="alert alert-danger">
+                <strong> Error! </strong> {{ error }}
+            </div>
+        {% endfor  %}
+    {%  endif %}
+    <table class="table obg-companies-table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if tagsVocabularies is empty %}
+            <tr>
+                <td colspan="10" class="text-center"><strong>No results</strong></td>
+            </tr>
+        {% else %}
+            {% for tagsVocabulary in tagsVocabularies %}
+                <tr>
+                    <td>{{ tagsVocabulary.name }}</td>
+                    <td>
+                        <div class="obg-companies-actions-list btn-group obg-button-group">
+                            <a type="button" href="{{ path('tagsvocabulary_edit', { 'id': tagsVocabulary.id }) }}" class="btn btn-default obg-action-dropdown-btn">View</a>
+                            <button type="button" class="btn obg-action-dropdown-btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form method="POST" action="{{ path('vocabulary_delete', {'id': tagsVocabulary.id}) }}">
+                                        <input type="hidden" id="_token" name="_token" value="{{ csrf_token('delete_token') }}">
+                                        <input class="obg-dropdown-menu-button" type="submit" value="Delete">
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
